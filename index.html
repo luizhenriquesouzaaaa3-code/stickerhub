@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StickerHub | Acesso</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: #f7f0ec;
+            padding: 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 390px;
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px #00000012;
+        }
+
+        h1 {
+            color: #bd8297;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        p {
+            color: #777;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin: 18px 0 7px;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #eadde1;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 22px;
+            border: none;
+            border-radius: 10px;
+            background: #c987a0;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="login-card">
+        <h1>StickerHub</h1>
+        <p>Acesse sua conta</p>
+
+        <form id="adminLoginForm">
+            <label for="email">E-mail</label>
+            <input
+                id="email"
+                type="email"
+                required
+                autocomplete="username"
+                placeholder="Seu e-mail"
+            >
+
+            <label for="password">Senha</label>
+            <input
+                id="password"
+                type="password"
+                required
+                autocomplete="current-password"
+                placeholder="Sua senha"
+            >
+
+            <button type="submit" id="loginButton">
+                Entrar
+            </button>
+
+            <p id="status" role="status"></p>
+        </form>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script/supabase.js"></script>
+
+    <script>
+        const form = document.getElementById("adminLoginForm");
+        const status = document.getElementById("status");
+        const button = document.getElementById("loginButton");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            button.disabled = true;
+            status.textContent = "Verificando acesso...";
+
+            try {
+                const { data, error } =
+                    await supabaseClient.auth.signInWithPassword({
+                        email: document.getElementById("email").value.trim(),
+                        password: document.getElementById("password").value
+                    });
+
+                if (error) throw error;
+
+                const { data: profile, error: profileError } =
+                    await supabaseClient
+                        .from("profiles")
+                        .select("role")
+                        .eq("id", data.user.id)
+                        .single();
+
+                if (profileError) throw profileError;
+
+                // CORREÇÃO APLICADA AQUI:
+                if (profile.role === "admin") {
+                    status.textContent = "Administrador identificado! 🚀";
+                    window.location.href = "admin.html"; // Redireciona corretamente para o painel admin
+
+                } else if (profile.role === "customer") {
+                    status.textContent = "Cliente identificado! 💗";
+                    window.location.href = "clientes.html"; // Redireciona para a área do cliente
+
+                } else {
+                    await supabaseClient.auth.signOut();
+                    throw new Error("Tipo de conta inválido.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                status.textContent = error.message;
+                button.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>

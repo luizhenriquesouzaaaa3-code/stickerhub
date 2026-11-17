@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StickerHub | Minha área</title>
+    <link rel="stylesheet" href="css/cliente.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="cliente.html" class="logo">Sticker<span>Hub</span></a>
+
+        <div class="user-area">
+            <span id="userEmail">Carregando...</span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="welcome">
+            <p class="eyebrow">SUA ÁREA EXCLUSIVA</p>
+            <h1>Bem-vindo ao StickerHub! 💗</h1>
+            <p>Todos os seus pacotes de figurinhas estão aqui.</p>
+        </section>
+
+        <section class="packages-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Meus pacotes</h2>
+                    <p>Pacotes liberados para sua conta.</p>
+                </div>
+                <span id="packageCount">0 pacotes</span>
+            </div>
+
+            <div id="packageList" class="package-grid">
+                <p class="loading">Carregando seus pacotes...</p>
+            </div>
+        </section>
+
+        <section id="stickerSection" class="sticker-section" hidden>
+            <div class="section-heading">
+                <div>
+                    <button id="backButton" class="back-button">
+                        ← Voltar aos pacotes
+                    </button>
+                    <h2 id="selectedPackageName"></h2>
+                    <p>Suas figurinhas estão prontas!</p>
+                </div>
+            </div>
+
+            <div id="stickerList" class="sticker-grid"></div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>StickerHub © 2026 · Feito com carinho 💗</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script/supabase.js"></script>
+    <script src="script/cliente.js"></script>
+
+</body>
+</html>

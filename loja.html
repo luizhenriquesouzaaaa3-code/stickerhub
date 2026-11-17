@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>StickerHub | Loja</title>
+
+    <link rel="stylesheet" href="css/loja.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <a href="loja.html" class="logo">
+            Sticker<span>Hub.</span>
+        </a>
+
+        <nav>
+            <a href="#inicio">Início</a>
+            <a href="#colecoes">Coleções</a>
+            <a href="#colecoes">Explorar</a>
+        </nav>
+
+        <button class="account-button">
+            Minha conta
+        </button>
+
+    </header>
+
+    <main>
+
+        <!-- APRESENTAÇÃO -->
+
+        <section class="welcome" id="inicio">
+
+            <span class="tag">
+                SUA BIBLIOTECA CRIATIVA
+            </span>
+
+            <h1>
+                Expresse tudo com
+                <span>figurinhas.</span>
+            </h1>
+
+            <p>
+                Escolha suas favoritas e leve um pouquinho
+                de personalidade para suas conversas.
+            </p>
+
+        </section>
+
+        <!-- EXPLORAR -->
+
+        <section class="explore" id="colecoes">
+
+            <div class="explore-heading">
+
+                <div>
+                    <span class="tag">
+                        EXPLORE NOSSA BIBLIOTECA
+                    </span>
+
+                    <h2>Encontre sua figurinha.</h2>
+
+                    <p>
+                        Um pequeno detalhe pode expressar muito.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- PESQUISA -->
+
+            <div class="store-controls">
+
+                <div class="search-box">
+
+                    <span>⌕</span>
+
+                    <input
+                        type="search"
+                        id="stickerSearch"
+                        placeholder="Pesquisar figurinhas..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+                <!-- FILTRO -->
+
+                <select id="collectionFilter">
+
+                    <option value="all">
+                        Todas as coleções
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- GALERIA DINÂMICA -->
+
+            <div id="collectionGallery">
+
+                <div class="sticker-grid"></div>
+
+            </div>
+
+            <p
+                id="emptyMessage"
+                class="empty-message"
+                hidden
+            >
+                Nenhuma figurinha encontrada. 💗
+            </p>
+
+        </section>
+
+    </main>
+
+    <!-- MODAL DA FIGURINHA -->
+
+    <div class="modal" id="stickerModal">
+
+        <div class="modal-content">
+
+            <button
+                class="close-button"
+                id="closeModal"
+                aria-label="Fechar"
+            >
+                &times;
+            </button>
+
+            <div class="sticker-preview">
+
+                <span id="previewEmoji">🥺</span>
+
+            </div>
+
+            <h2 id="previewName">
+                Nome da figurinha
+            </h2>
+
+            <p>
+                Como deseja receber sua figurinha?
+            </p>
+
+            <div class="modal-actions">
+
+                <button id="copyButton">
+                    📋 Copiar
+                </button>
+
+                <button id="downloadButton">
+                    ⬇ Download
+                </button>
+
+            </div>
+
+            <p
+                id="statusMessage"
+                aria-live="polite"
+            ></p>
+
+        </div>
+
+    </div>
+
+    <script src="script/loja.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script/supabase.js"></script>
+<script src="script/loja.js"></script>
+</body>
+
+</html>
