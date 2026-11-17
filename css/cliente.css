@@ -1,0 +1,497 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #faf6f4;
+    color: #443b3e;
+    min-height: 100vh;
+}
+
+.topbar {
+    height: 75px;
+    padding: 0 7%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0e6e8;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+    color: #493d42;
+    text-decoration: none;
+}
+
+.logo span {
+    color: #c987a0;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 13px;
+    color: #82767b;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+#logoutButton {
+    background: #f8edf1;
+    color: #b56f89;
+    padding: 10px 17px;
+    border-radius: 9px;
+}
+
+.container {
+    max-width: 1150px;
+    margin: auto;
+    padding: 55px 25px;
+}
+
+.welcome {
+    background: linear-gradient(120deg, #f5dfe7, #f9ecec);
+    padding: 40px;
+    border-radius: 20px;
+    margin-bottom: 50px;
+}
+
+.eyebrow {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #b16e87;
+    font-weight: bold;
+    margin-bottom: 14px;
+}
+
+.welcome h1 {
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.welcome p:last-child {
+    color: #826f77;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.section-heading h2 {
+    font-size: 23px;
+    margin: 10px 0;
+}
+
+.section-heading p {
+    color: #93858a;
+    font-size: 14px;
+}
+
+#packageCount {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: #b16e87;
+    font-size: 13px;
+}
+
+.package-grid,
+.sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 22px;
+}
+
+.package-card {
+    background: white;
+    border-radius: 16px;
+    padding: 23px;
+    border: 1px solid #f0e7e9;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.package-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px #0000000c;
+}
+
+.package-cover {
+    height: 135px;
+    background: linear-gradient(135deg, #f3dce5, #f9eeee);
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+    overflow: hidden;
+    font-size: 45px;
+}
+
+.package-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.package-card h3 {
+    font-size: 17px;
+    margin-bottom: 9px;
+}
+
+.package-card p {
+    color: #93858a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.open-package {
+    display: inline-block;
+    margin-top: 17px;
+    color: #b56f89;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.loading,
+.empty-message {
+    color: #998b90;
+    padding: 25px 0;
+    line-height: 1.6;
+}
+
+.sticker-section {
+    margin-top: 55px;
+}
+
+.back-button {
+    background: transparent;
+    color: #b16e87;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.sticker-card {
+    background: white;
+    padding: 13px;
+    border-radius: 15px;
+    border: 1px solid #f0e7e9;
+}
+
+.sticker-card img {
+    width: 100%;
+    height: 175px;
+    object-fit: contain;
+    background: #faf6f4;
+    border-radius: 10px;
+}
+
+.sticker-card h3 {
+    font-size: 14px;
+    margin: 12px 0;
+}
+
+.download-button {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    background: #c987a0;
+    color: white;
+    padding: 11px;
+    border-radius: 9px;
+    font-size: 13px;
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #a5969b;
+    font-size: 12px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    .topbar {
+        padding: 0 18px;
+    }
+
+    .user-area {
+        gap: 8px;
+        font-size: 11px;
+    }
+
+    .container {
+        padding: 30px 18px;
+    }
+
+    .welcome {
+        padding: 28px 22px;
+    }
+
+    .welcome h1 {
+        font-size: 24px;
+    }
+}
+
+/* =========================================
+   ESTILIZAÇÃO MODERNA - GERENCIAMENTO DE CLIENTES
+   (StickerHub)
+========================================= */
+
+/* Área principal do container de clientes */
+.customer-management {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .customer-management {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Estilização dos selects (Combobox) */
+.settings-card select {
+    width: 100%;
+    padding: 12px 14px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    background-color: #faf6f7;
+    border: 1px solid #e6d7dc;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.settings-card select:focus {
+    border-color: #b85c79;
+    box-shadow: 0 0 0 3px rgba(184, 92, 121, 0.12);
+    background-color: #fff;
+}
+
+/* Botão de liberar acesso */
+#grantAccessButton {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #b85c79, #9e4663);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(184, 92, 121, 0.25);
+}
+
+#grantAccessButton:hover {
+    opacity: 0.95;
+    box-shadow: 0 6px 16px rgba(184, 92, 121, 0.35);
+    transform: translateY(-1px);
+}
+
+#grantAccessButton:active {
+    transform: translateY(0);
+}
+
+/* Cards individuais de cada cliente na lista */
+.customer-card {
+    background: #ffffff;
+    border: 1px solid #f0e6e9;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    transition: box-shadow 0.2s ease;
+}
+
+.customer-card:hover {
+    box-shadow: 0 4px 14px rgba(184, 92, 121, 0.08);
+}
+
+.customer-card h3 {
+    font-size: 16px;
+    color: #2b2b2b;
+    margin-bottom: 4px;
+}
+
+.customer-card p {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 12px;
+}
+
+/* Container de pacotes dentro do card do cliente */
+.customer-packages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid #f5eff1;
+    padding-top: 12px;
+    margin-top: 8px;
+}
+
+/* Linha de cada pacote vinculado */
+.customer-access-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #faf6f7;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #444;
+}
+
+/* Botão de revogar acesso */
+.revoke-button {
+    background-color: transparent;
+    color: #d9534f;
+    border: 1px solid #f5c6cb;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.revoke-button:hover {
+    background-color: #d9534f;
+    color: #ffffff;
+}
+
+/* Mensagens de status / vazio */
+#customerStatus {
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.empty-message {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 20px;
+    font-size: 14px;
+}
+
+/* =========================================
+   RAMOS DE CEREJEIRA E FLORES NO FUNDO (CLIENTE)
+========================================= */
+
+body {
+    position: relative;
+    background-color: #fcf8f6;
+    overflow-x: hidden;
+}
+
+/* Ramos e flores decorativas no fundo da área do cliente */
+body::before,
+body::after {
+    content: "🌿🌸 🌸🌿 🌸 🌸🌿 🌸";
+    position: absolute;
+    font-size: 28px;
+    opacity: 0.35;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    white-space: nowrap;
+}
+
+/* Ramo superior direito */
+body::before {
+    top: 15px;
+    right: 20px;
+    letter-spacing: 12px;
+    transform: rotate(8deg);
+}
+
+/* Ramo inferior esquerdo */
+body::after {
+    bottom: 20px;
+    left: 30px;
+    letter-spacing: 15px;
+    transform: rotate(-6deg);
+}
+
+/* Ramo extra no topo esquerdo para equilibrar */
+header.topbar::before {
+    content: "🌸 🌿 🌸 🌸 🌿";
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    font-size: 26px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+    transform: rotate(-15deg);
+}
+
+/* Garante que o cabeçalho, conteúdo e rodapé fiquem acima dos ramos */
+header, main, footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* =========================================
+   FUNDO TOTALMENTE COBERTO COM FLORES E MÃOS DE DORAMA (CLIENTE)
+========================================= */
+
+body {
+    position: relative;
+    background-color: #fcf8f6;
+    overflow-x: hidden;
+}
+
+/* Criando uma camada de fundo fixa que espalha elementos por toda a página */
+body::before {
+    content: "🌸 🫶 🌿 🌸 🌸 🫰 🌿 🌸 🌸 🫶 🌿 🌸 🌸 🫰 🌿 🌸 🌸 🫶 🌿 🌸";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    font-size: 32px;
+    opacity: 0.16; /* Suave para preencher sem poluir */
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: space-around;
+    overflow: hidden;
+    letter-spacing: 40px;
+    line-height: 120px;
+    padding: 20px;
+}
+
+/* Garante que o conteúdo do site fique totalmente acima da camada de fundo */
+header, main, footer, .package-card, .sticker-card {
+    position: relative;
+    z-index: 1;
+}
+
