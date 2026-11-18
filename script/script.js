@@ -107,7 +107,6 @@ async function updateDashboard() {
 }
 
 // RENDERIZAR PACOTES
-
 function renderCollections(packs, stickers) {
     if (!collectionList) return;
 
@@ -135,7 +134,13 @@ function renderCollections(packs, stickers) {
         const description = document.createElement("p");
         description.textContent = `${total} figurinhas`;
 
-        card.append(title, description);
+        // 👉 Botão de Excluir
+        const btnExcluir = document.createElement("button");
+        btnExcluir.className = "btn-excluir";
+        btnExcluir.innerHTML = "🗑️ Excluir";
+        btnExcluir.onclick = () => excluirPacote(pack.id, pack.name);
+
+        card.append(title, description, btnExcluir);
         collectionList.appendChild(card);
     });
 }
@@ -195,4 +200,25 @@ if (adminLogoutButton) {
             alert("Erro ao encerrar a sessão.");
         }
     });
+}
+// EXCLUIR PACOTE
+async function excluirPacote(idPacote, nomePacote) {
+    const confirmar = confirm(`Tem certeza que deseja excluir o pacote "${nomePacote || 'Sem nome'}"?`);
+    if (!confirmar) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from("packs")
+            .delete()
+            .eq("id", idPacote);
+
+        if (error) throw error;
+
+        alert("Pacote excluído com sucesso! 🌸");
+        updateDashboard(); // Atualiza a lista na tela na hora
+
+    } catch (error) {
+        console.error("Erro ao excluir pacote:", error);
+        alert("Erro ao excluir o pacote. Verifique se ele possui figurinhas atreladas ou as permissões no Supabase.");
+    }
 }
