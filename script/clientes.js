@@ -42,8 +42,11 @@ if (registerClientButton) {
         registerClientButton.textContent = "Cadastrando...";
 
         try {
-            // Cria o usuário no Supabase Auth sem deslogar o admin atual
-            // (Nota: Se sua tabela 'profiles' não tiver trigger automático de criação, o upsert abaixo garante o registro)
+            // Guarda a sessão atual do admin para não ser deslogado caso o signUp troque o token local
+            const { data: adminSessionData } = await supabaseClient.auth.getSession();
+            const adminSession = adminSessionData?.session;
+
+            // Cria o usuário no Supabase Auth
             const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                 email: email,
                 password: password,
@@ -53,6 +56,14 @@ if (registerClientButton) {
             });
 
             if (authError) throw authError;
+
+            // Restaura a sessão do admin imediatamente se o Supabase tiver trocado para o novo usuário
+            if (adminSession) {
+                await supabaseClient.auth.setSession({
+                    access_token: adminSession.access_token,
+                    refresh_token: adminSession.refresh_token
+                });
+            }
 
             // Garante que o perfil esteja salvo na tabela profiles com o ID gerado
             if (authData && authData.user) {
@@ -95,25 +106,42 @@ if (registerClientButton) {
     });
 }
 
-// 2. CARREGAR CLIENTES PARA O SELECT E PARA A LISTA
+// 2. CARREGAR CLIENTES PARA O SELECT E PARA A LISTA (FILTRANDO O ADMIN)
 async function carregarClientesEfetivos() {
     if (!customerSelect && !customerList) return;
 
     try {
-        const { data: clientes, error } = await supabaseClient
+        // Pega o usuário logado atualmente (Admin) para excluí-lo da lista automaticamente
+        const { data: userData } = await supabaseClient.auth.getUser();
+        const adminLogado = userData?.user;
+
+        const { data: perfis, error } = await supabaseClient
             .from("profiles")
             .select("*");
 
         if (error) throw error;
 
+        // Filtra removendo:
+        // - Quem tem o mesmo ID ou e-mail do admin logado agora
+        // - Quem tiver role === 'admin' ou is_admin === true na tabela profiles
+        const apenasClientes = perfis.filter(perfil => {
+            if (adminLogado && (perfil.id === adminLogado.id || perfil.email === adminLogado.email)) {
+                return false;
+            }
+            if (perfil.role === "admin" || perfil.is_admin === true) {
+                return false;
+            }
+            return true;
+        });
+
         if (customerCount) {
-            customerCount.textContent = `${clientes.length} cliente${clientes.length === 1 ? '' : 's'}`;
+            customerCount.textContent = `${apenasClientes.length} cliente${apenasClientes.length === 1 ? '' : 's'}`;
         }
 
-        // Preenche o Select de clientes
+        // Preenche o Select de clientes (sem o admin)
         if (customerSelect) {
             customerSelect.innerHTML = '<option value="">Selecione um cliente</option>';
-            clientes.forEach(cliente => {
+            apenasClientes.forEach(cliente => {
                 const option = document.createElement("option");
                 option.value = cliente.id;
                 option.textContent = cliente.name ? `${cliente.name} (${cliente.email})` : cliente.email;
@@ -121,15 +149,15 @@ async function carregarClientesEfetivos() {
             });
         }
 
-        // Renderiza a lista visual de clientes
+        // Renderiza a lista visual de clientes (sem o admin)
         if (customerList) {
             customerList.innerHTML = "";
-            if (clientes.length === 0) {
+            if (apenasClientes.length === 0) {
                 customerList.innerHTML = '<p class="empty-message">Nenhum cliente cadastrado ainda.</p>';
                 return;
             }
 
-            clientes.forEach(cliente => {
+            apenasClientes.forEach(cliente => {
                 const card = document.createElement("div");
                 card.className = "file-item";
                 card.style.display = "flex";
