@@ -8,6 +8,33 @@
     <title>StickerHub | Administração</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Estilo do botão de excluir alinhado com o tema do StickerHub -->
+    <style>
+        .btn-excluir {
+            background-color: #ffe4e6;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .btn-excluir:hover {
+            background-color: #fecdd3;
+            color: #be123c;
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 
 <body>
@@ -379,45 +406,8 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-        // Função para excluir um pacote pelo ID
-async function excluirPacote(idPacote, nomePacote) {
-    // 1. Confirmação de segurança
-    const confirmar = confirm(`Tem certeza que deseja excluir o pacote "${nomePacote}"? Essa ação não pode ser desfeita.`);
-    if (!confirmar) return;
-
-    try {
-        // 2. Deleta o registro da tabela no Supabase
-        // (Troque 'pacotes' pelo nome exato da sua tabela se for diferente, ex: 'stickers' ou 'packs')
-        const { error } = await supabaseClient
-            .from('pacotes') 
-            .delete()
-            .eq('id', idPacote);
-
-        if (error) {
-            throw error;
-        }
-
-        alert('Pacote excluído com sucesso! 🌸');
-        
-        // 3. Recarrega a lista de pacotes na tela 
-        // (Chame aqui a função que você já usa para listar os pacotes, ex: carregarPacotes())
-        if (typeof carregarPacotes === 'function') {
-            carregarPacotes();
-        } else {
-            location.reload(); // Atualiza a página caso a função tenha outro nome
-        }
-
-    } catch (erro) {
-        console.error('Erro ao excluir pacote:', erro);
-        alert('Não foi possível excluir o pacote. Verifique as permissões (RLS) no Supabase.');
-    }
-}
-        <button class="btn-excluir" onclick="excluirPacote('${pacote.id}', '${pacote.nome}')">
-    🗑️ Excluir
-</button>
-    </script>
-
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script/supabase.js"></script>
     <script src="script/script.js"></script>
     <script src="script/import.js"></script>
