@@ -285,56 +285,77 @@
     </button>
 </div>
    
-            <section class="admin-section" id="customers">
+          <!-- CLIENTES -->
+<section class="admin-section" id="customers">
 
-                <div class="section-heading">
-                    <h2>Gerenciar clientes</h2>
-                    <p>Controle os acessos aos pacotes da sua loja.</p>
+    <div class="section-heading">
+        <h2>Gerenciar clientes</h2>
+        <p>Cadastre clientes e controle os acessos aos pacotes da sua loja.</p>
+    </div>
+
+    <div class="customer-management" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+        <!-- COLUNA DA ESQUERDA: CADASTRAR E LIBERAR -->
+        <div>
+            <!-- CADASTRAR NOVO CLIENTE -->
+            <div class="settings-card" style="margin-bottom: 20px;">
+                <h3>Cadastrar novo cliente</h3>
+                <p>Adicione os dados para permitir o vínculo de pacotes.</p>
+
+                <label for="newClientEmail">E-mail do cliente</label>
+                <input type="email" id="newClientEmail" placeholder="cliente@email.com" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd;">
+
+                <label for="newClientName">Nome do cliente (opcional)</label>
+                <input type="text" id="newClientName" placeholder="Ex: Maria Silva" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd;">
+
+                <button id="registerClientButton" style="width: 100%;">
+                    Cadastrar cliente
+                </button>
+            </div>
+
+            <!-- LIBERAR PACOTE -->
+            <div class="settings-card">
+                <h3>Liberar pacote</h3>
+                <p>Escolha um cliente e o pacote que deseja liberar.</p>
+
+                <label for="customerSelect">Cliente</label>
+                <select id="customerSelect" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                    <option value="">Carregando clientes...</option>
+                </select>
+
+                <label for="customerPackSelect">Pacote</label>
+                <select id="customerPackSelect" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                    <option value="">Carregando pacotes...</option>
+                </select>
+
+                <button id="grantAccessButton" style="width: 100%;">
+                    Liberar acesso
+                </button>
+
+                <p id="customerStatus" role="status" style="margin-top: 10px;"></p>
+            </div>
+        </div>
+
+        <!-- COLUNA DA DIREITA: LISTA DE CLIENTES -->
+        <div class="file-list-area">
+            <div class="file-list-header">
+                <div>
+                    <h3>Clientes cadastrados</h3>
+                    <p>Visualize os clientes e seus respectivos acessos.</p>
                 </div>
+                <span id="customerCount">0 clientes</span>
+            </div>
 
-                <div class="customer-management">
+            <div id="customerList">
+                <p class="empty-message">
+                    Carregando clientes...
+                </p>
+            </div>
+        </div>
 
-                    <div class="settings-card">
-                        <h3>Liberar pacote</h3>
-                        <p>Escolha um cliente e o pacote que deseja liberar.</p>
+    </div>
 
-                        <label for="customerSelect">Cliente</label>
-                        <select id="customerSelect">
-                            <option value="">Carregando clientes...</option>
-                        </select>
-
-                        <label for="customerPackSelect">Pacote</label>
-                        <select id="customerPackSelect">
-                            <option value="">Carregando pacotes...</option>
-                        </select>
-
-                        <button id="grantAccessButton">
-                            Liberar acesso
-                        </button>
-
-                        <p id="customerStatus" role="status"></p>
-                    </div>
-
-                    <div class="file-list-area">
-                        <div class="file-list-header">
-                            <div>
-                                <h3>Clientes cadastrados</h3>
-                                <p>Visualize os clientes e seus respectivos acessos.</p>
-                            </div>
-                            <span id="customerCount">0 clientes</span>
-                        </div>
-
-                        <div id="customerList">
-                            <p class="empty-message">
-                                Carregando clientes...
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </section>
-
+</section>
             <!-- CONFIGURAÇÕES -->
 
             <section class="admin-section" id="settings">
