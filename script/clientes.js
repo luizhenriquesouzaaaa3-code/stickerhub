@@ -19,39 +19,78 @@ const customerCount = document.getElementById("customerCount");
 const registerClientButton = document.getElementById("registerClientButton");
 const newClientEmailInput = document.getElementById("newClientEmail");
 const newClientNameInput = document.getElementById("newClientName");
+const newClientPasswordInput = document.getElementById("newClientPassword");
 
 // 1. CADASTRAR NOVO CLIENTE DIRETAMENTE PELO PAINEL
 if (registerClientButton) {
     registerClientButton.addEventListener("click", async () => {
         const email = newClientEmailInput.value.trim();
         const name = newClientNameInput ? newClientNameInput.value.trim() : "";
+        const password = newClientPasswordInput ? newClientPasswordInput.value.trim() : "";
 
-        if (!email) {
-            alert("Por favor, digite o e-mail do cliente.");
+        if (!email || !password) {
+            alert("Por favor, preencha o e-mail e uma senha inicial (mínimo 6 caracteres) para o cliente.");
             return;
         }
 
+        if (password.length < 6) {
+            alert("A senha deve ter pelo menos 6 caracteres.");
+            return;
+        }
+
+        registerClientButton.disabled = true;
+        registerClientButton.textContent = "Cadastrando...";
+
         try {
-            // Insere na tabela de perfis/clientes do Supabase 
-            // (Caso sua tabela de clientes use outro nome, ajuste 'profiles' para o nome correto)
-            const { error } = await supabaseClient
-                .from("profiles")
-                .insert([{ email: email, name: name }]);
+            // Cria o usuário no Supabase Auth sem deslogar o admin atual
+            // (Nota: Se sua tabela 'profiles' não tiver trigger automático de criação, o upsert abaixo garante o registro)
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: { name: name }
+                }
+            });
 
-            if (error) throw error;
+            if (authError) throw authError;
 
-            alert("Cliente cadastrado com sucesso! 🌸");
+            // Garante que o perfil esteja salvo na tabela profiles com o ID gerado
+            if (authData && authData.user) {
+                const { error: profileError } = await supabaseClient
+                    .from("profiles")
+                    .upsert([
+                        { 
+                            id: authData.user.id, 
+                            email: email, 
+                            name: name 
+                        }
+                    ]);
+
+                if (profileError) {
+                    console.warn("Aviso ao atualizar tabela profiles:", profileError.message);
+                }
+            }
+
+            alert(`Cliente cadastrado com sucesso! 🌸\nE-mail: ${email}\nSenha: ${password}`);
             
             // Limpa os campos
             newClientEmailInput.value = "";
             if (newClientNameInput) newClientNameInput.value = "";
+            if (newClientPasswordInput) newClientPasswordInput.value = "";
 
             // Recarrega a lista de clientes
-            carregarClientesEfetivos();
+            setTimeout(() => carregarClientesEfetivos(), 500);
 
         } catch (error) {
             console.error("Erro ao cadastrar cliente:", error);
-            alert("Erro ao cadastrar cliente. Verifique se o e-mail já existe ou as permissões no Supabase.");
+            if (error.message && error.message.includes("already registered")) {
+                alert("Este e-mail já está cadastrado no sistema!");
+            } else {
+                alert(`Erro ao cadastrar: ${error.message || "Verifique as configurações do Supabase."}`);
+            }
+        } finally {
+            registerClientButton.disabled = false;
+            registerClientButton.textContent = "Cadastrar cliente";
         }
     });
 }
@@ -92,7 +131,7 @@ async function carregarClientesEfetivos() {
 
             clientes.forEach(cliente => {
                 const card = document.createElement("div");
-                card.className = "file-item"; // Reaproveita o estilo padrão de listagem
+                card.className = "file-item";
                 card.style.display = "flex";
                 card.style.justifyContent = "space-between";
                 card.style.alignItems = "center";
