@@ -1,249 +1,179 @@
-/* =========================================
-   STICKERHUB - GERENCIAMENTO DE CLIENTES
-========================================= */
+// =========================================
+// GERENCIAMENTO DE CLIENTES E ACESSOS (USER_PACKS)
+// =========================================
 
+document.addEventListener("DOMContentLoaded", () => {
+    carregarClientesEfetivos();
+    carregarPacotesParaClientes();
+});
+
+// Elementos da tela
 const customerSelect = document.getElementById("customerSelect");
 const customerPackSelect = document.getElementById("customerPackSelect");
 const grantAccessButton = document.getElementById("grantAccessButton");
-
+const customerStatus = document.getElementById("customerStatus");
 const customerList = document.getElementById("customerList");
 const customerCount = document.getElementById("customerCount");
-const customerStatus = document.getElementById("customerStatus");
 
-// Variável global para manter a lista de clientes em cache para recarregamentos
-let allCustomers = [];
+// Elementos de Cadastro de Cliente
+const registerClientButton = document.getElementById("registerClientButton");
+const newClientEmailInput = document.getElementById("newClientEmail");
+const newClientNameInput = document.getElementById("newClientName");
 
-// CARREGAR CLIENTES
+// 1. CADASTRAR NOVO CLIENTE DIRETAMENTE PELO PAINEL
+if (registerClientButton) {
+    registerClientButton.addEventListener("click", async () => {
+        const email = newClientEmailInput.value.trim();
+        const name = newClientNameInput ? newClientNameInput.value.trim() : "";
 
-async function loadCustomers() {
-    customerList.innerHTML =
-    '<p class="empty-message">Buscando clientes...</p>';
-    console.log("LOAD CUSTOMERS FOI EXECUTADA!");
-
-    const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("id, email, full_name")
-        .eq("role", "customer")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error("ERRO AO BUSCAR CLIENTES:", error);
-        customerStatus.textContent = error.message;
-        return;
-    }
-
-    console.log("CLIENTES RECEBIDOS DO SUPABASE:", data);
-
-    allCustomers = data || []; // Salva na variável global
-
-    customerSelect.innerHTML = '<option value="">Selecione um cliente</option>';
-
-    allCustomers.forEach(customer => {
-        const option = document.createElement("option");
-        option.value = customer.id;
-        option.textContent = customer.full_name || customer.email;
-        customerSelect.appendChild(option);
-    });
-
-    await renderCustomers(allCustomers);
-}
-
-// CARREGAR PACOTES
-
-async function loadCustomerPacks() {
-    customerPackSelect.innerHTML =
-    '<option value="">Buscando pacotes...</option>';
-    const { data, error } = await supabaseClient
-        .from("packs")
-        .select("id, name")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error(error);
-        customerPackSelect.innerHTML = '<option value="">Erro ao carregar</option>';
-        return;
-    }
-
-    customerPackSelect.innerHTML = '<option value="">Selecione um pacote</option>';
-
-    data.forEach(pack => {
-        const option = document.createElement("option");
-        option.value = pack.id;
-        option.textContent = pack.name;
-        customerPackSelect.appendChild(option);
-    });
-}
-
-// RENDERIZAR CLIENTES
-
-async function renderCustomers(customers) {
-    customerList.innerHTML = "";
-
-    customerCount.textContent =
-        `${customers.length} cliente${customers.length !== 1 ? "s" : ""}`;
-
-    if (customers.length === 0) {
-        customerList.innerHTML =
-            '<p class="empty-message">Nenhum cliente cadastrado.</p>';
-        return;
-    }
-
-    const { data: accesses, error } = await supabaseClient
-        .from("user_packs")
-        .select("id, user_id, pack_id, packs(name)");
-
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    customers.forEach(customer => {
-        const card = document.createElement("div");
-        card.className = "customer-card";
-
-        const name = document.createElement("h3");
-        name.textContent = customer.full_name || "Cliente";
-
-        const email = document.createElement("p");
-        email.textContent = customer.email;
-
-        const packages = document.createElement("div");
-        packages.className = "customer-packages";
-
-        const customerAccesses = accesses.filter(
-            access => access.user_id === customer.id
-        );
-
-        if (customerAccesses.length === 0) {
-            packages.textContent = "Nenhum pacote liberado.";
-        } else {
-            customerAccesses.forEach(access => {
-                const row = document.createElement("div");
-                row.className = "customer-access-row";
-
-                const packName = document.createElement("span");
-                packName.textContent = access.packs?.name || "Pacote";
-
-                const revokeButton = document.createElement("button");
-                revokeButton.textContent = "Revogar";
-                revokeButton.className = "revoke-button";
-                revokeButton.type = "button"; // Evita comportamento de submit indesejado
-
-                revokeButton.addEventListener("click", () => {
-                    revokeAccess(access.id);
-                });
-
-                row.append(packName, revokeButton);
-                packages.appendChild(row);
-            });
-        }
-
-        card.append(name, email, packages);
-        customerList.appendChild(card);
-    });
-}
-
-// LIBERAR ACESSO
-
-async function grantAccess() {
-    const userId = customerSelect.value;
-    const packId = customerPackSelect.value;
-
-    customerStatus.textContent = "";
-
-    if (!userId || !packId) {
-        customerStatus.textContent = "Selecione um cliente e um pacote.";
-        return;
-    }
-
-    const { error } = await supabaseClient
-        .from("user_packs")
-        .insert({
-            user_id: userId,
-            pack_id: packId
-        });
-
-    if (error) {
-    console.error("ERRO AO LIBERAR ACESSO:", error);
-
-    customerStatus.textContent =
-        `Erro: ${error.message}`;
-
-    return;
-}
-
-    customerStatus.textContent = "Acesso liberado com sucesso! 💗";
-
-    await loadCustomers();
-}
-
-// REVOGAR ACESSO
-
-async function revokeAccess(accessId) {
-    const confirmed = confirm("Deseja realmente revogar esse acesso?");
-
-    if (!confirmed) return;
-
-    const { error } = await supabaseClient
-        .from("user_packs")
-        .delete()
-        .eq("id", accessId);
-
-    if (error) {
-        console.error(error);
-        alert("Não foi possível revogar o acesso.");
-        return;
-    }
-
-    // Usa a lista global em cache para re-renderizar sem precisar refazer a query de perfis
-    await renderCustomers(allCustomers);
-}
-
-// INICIALIZAÇÃO
-
-async function initializeCustomerManagement() {
-    // Executar somente na página administrativa
-    if (!customerList || !customerStatus ||
-        !customerSelect || !customerPackSelect) {
-        return;
-    }
-
-    try {
-        customerStatus.textContent = "Carregando gerenciamento...";
-
-        const isAdmin = await verificarAdmin();
-
-        if (!isAdmin) {
-            customerStatus.textContent = "Acesso não autorizado.";
-            customerList.textContent = "Acesso não autorizado.";
+        if (!email) {
+            alert("Por favor, digite o e-mail do cliente.");
             return;
         }
 
-        await Promise.all([
-            loadCustomers(),
-            loadCustomerPacks()
-        ]);
+        try {
+            // Insere na tabela de perfis/clientes do Supabase 
+            // (Caso sua tabela de clientes use outro nome, ajuste 'profiles' para o nome correto)
+            const { error } = await supabaseClient
+                .from("profiles")
+                .insert([{ email: email, name: name }]);
 
-        customerStatus.textContent = "";
+            if (error) throw error;
+
+            alert("Cliente cadastrado com sucesso! 🌸");
+            
+            // Limpa os campos
+            newClientEmailInput.value = "";
+            if (newClientNameInput) newClientNameInput.value = "";
+
+            // Recarrega a lista de clientes
+            carregarClientesEfetivos();
+
+        } catch (error) {
+            console.error("Erro ao cadastrar cliente:", error);
+            alert("Erro ao cadastrar cliente. Verifique se o e-mail já existe ou as permissões no Supabase.");
+        }
+    });
+}
+
+// 2. CARREGAR CLIENTES PARA O SELECT E PARA A LISTA
+async function carregarClientesEfetivos() {
+    if (!customerSelect && !customerList) return;
+
+    try {
+        const { data: clientes, error } = await supabaseClient
+            .from("profiles")
+            .select("*");
+
+        if (error) throw error;
+
+        if (customerCount) {
+            customerCount.textContent = `${clientes.length} cliente${clientes.length === 1 ? '' : 's'}`;
+        }
+
+        // Preenche o Select de clientes
+        if (customerSelect) {
+            customerSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            clientes.forEach(cliente => {
+                const option = document.createElement("option");
+                option.value = cliente.id;
+                option.textContent = cliente.name ? `${cliente.name} (${cliente.email})` : cliente.email;
+                customerSelect.appendChild(option);
+            });
+        }
+
+        // Renderiza a lista visual de clientes
+        if (customerList) {
+            customerList.innerHTML = "";
+            if (clientes.length === 0) {
+                customerList.innerHTML = '<p class="empty-message">Nenhum cliente cadastrado ainda.</p>';
+                return;
+            }
+
+            clientes.forEach(cliente => {
+                const card = document.createElement("div");
+                card.className = "file-item"; // Reaproveita o estilo padrão de listagem
+                card.style.display = "flex";
+                card.style.justifyContent = "space-between";
+                card.style.alignItems = "center";
+                card.style.padding = "10px";
+                card.style.marginBottom = "8px";
+                card.style.background = "#fff";
+                card.style.borderRadius = "8px";
+                card.style.border = "1px solid #eee";
+
+                card.innerHTML = `
+                    <div>
+                        <strong>${cliente.name || 'Sem nome'}</strong><br>
+                        <small style="color: #666;">${cliente.email}</small>
+                    </div>
+                `;
+                customerList.appendChild(card);
+            });
+        }
 
     } catch (error) {
-        console.error("ERRO AO INICIALIZAR CLIENTES:", error);
-
-        customerStatus.textContent =
-            "Erro ao carregar: " + error.message;
-
-        customerList.textContent =
-            "Não foi possível carregar os clientes.";
-
-        customerPackSelect.innerHTML =
-            '<option value="">Erro ao carregar pacotes</option>';
+        console.error("Erro ao carregar clientes:", error);
+        if (customerList) {
+            customerList.innerHTML = '<p class="empty-message">Erro ao carregar clientes.</p>';
+        }
     }
 }
 
-if (grantAccessButton) {
-    grantAccessButton.addEventListener("click", grantAccess);
+// 3. CARREGAR PACOTES DISPONÍVEIS PARA O SELECT
+async function carregarPacotesParaClientes() {
+    if (!customerPackSelect) return;
+
+    try {
+        const { data: packs, error } = await supabaseClient
+            .from("packs")
+            .select("id, name");
+
+        if (error) throw error;
+
+        customerPackSelect.innerHTML = '<option value="">Selecione um pacote</option>';
+        packs.forEach(pack => {
+            const option = document.createElement("option");
+            option.value = pack.id;
+            option.textContent = pack.name || "Pacote sem nome";
+            customerPackSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar pacotes para clientes:", error);
+    }
 }
 
-console.count("INICIALIZAÇÃO DO GERENCIAMENTO");
+// 4. LIBERAR ACESSO AO PACOTE (GRAVAR NA TABELA user_packs)
+if (grantAccessButton) {
+    grantAccessButton.addEventListener("click", async () => {
+        const userId = customerSelect.value;
+        const packId = customerPackSelect.value;
 
-initializeCustomerManagement();
+        if (!userId || !packId) {
+            alert("Selecione um cliente e um pacote para liberar o acesso.");
+            return;
+        }
+
+        if (customerStatus) customerStatus.textContent = "Liberando acesso...";
+
+        try {
+            const { error } = await supabaseClient
+                .from("user_packs")
+                .insert([{ user_id: userId, pack_id: packId }]);
+
+            if (error) throw error;
+
+            if (customerStatus) customerStatus.textContent = "Acesso liberado com sucesso! 🌸";
+            alert("Acesso ao pacote liberado para o cliente com sucesso!");
+            
+            customerSelect.value = "";
+            customerPackSelect.value = "";
+
+        } catch (error) {
+            console.error("Erro ao liberar acesso:", error);
+            if (customerStatus) customerStatus.textContent = "Erro ao liberar acesso (já possui ou falha na permissão).";
+            alert("Não foi possível liberar o acesso. Verifique se o cliente já possui este pacote liberado.");
+        }
+    });
+}
