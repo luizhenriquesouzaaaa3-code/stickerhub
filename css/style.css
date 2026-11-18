@@ -1024,6 +1024,27 @@ body {
     transform: rotate(-15deg);
 }
 
+.btn-excluir {
+    background-color: #ffe4e6;
+    color: #e11d48;
+    border: 1px solid #fecdd3;
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-excluir:hover {
+    background-color: #fecdd3;
+    color: #be123c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(225, 29, 72, 0.15);
+}
 /* Garante que o conteúdo e a sidebar fiquem acima dos ramos */
 .sidebar, .admin-main {
     position: relative;
