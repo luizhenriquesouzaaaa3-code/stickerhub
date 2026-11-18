@@ -181,4 +181,100 @@ async function carregarClientesEfetivos() {
         }
 
     } catch (error) {
-        console.error("Erro ao carregar clientes:",
+        console.error("Erro ao carregar clientes:", error);
+        if (customerList) {
+            customerList.innerHTML = '<p class="empty-message">Erro ao carregar clientes.</p>';
+        }
+    }
+}
+
+// 3. CARREGAR PACOTES DISPONÍVEIS PARA O SELECT
+async function carregarPacotesParaClientes() {
+    if (!customerPackSelect) return;
+
+    try {
+        const { data: packs, error } = await supabaseClient
+            .from("packs")
+            .select("id, name");
+
+        if (error) throw error;
+
+        customerPackSelect.innerHTML = '<option value="">Selecione um pacote</option>';
+        packs.forEach(pack => {
+            const option = document.createElement("option");
+            option.value = pack.id;
+            option.textContent = pack.name || "Pacote sem nome";
+            customerPackSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar pacotes para clientes:", error);
+    }
+}
+
+// 4. LIBERAR ACESSO AO PACOTE (GRAVAR NA TABELA user_packs)
+if (grantAccessButton) {
+    grantAccessButton.addEventListener("click", async () => {
+        const userId = customerSelect.value;
+        const packId = customerPackSelect.value;
+
+        if (!userId || !packId) {
+            alert("Selecione um cliente e um pacote para liberar o acesso.");
+            return;
+        }
+
+        if (customerStatus) customerStatus.textContent = "Liberando acesso...";
+
+        try {
+            const { error } = await supabaseClient
+                .from("user_packs")
+                .insert([{ user_id: userId, pack_id: packId }]);
+
+            if (error) throw error;
+
+            if (customerStatus) customerStatus.textContent = "Acesso liberado com sucesso! 🌸";
+            alert("Acesso ao pacote liberado para o cliente com sucesso!");
+            
+            customerSelect.value = "";
+            customerPackSelect.value = "";
+
+        } catch (error) {
+            console.error("Erro ao liberar acesso:", error);
+            if (customerStatus) customerStatus.textContent = "Erro ao liberar acesso (já possui ou falha na permissão).";
+            alert("Não foi possível liberar o acesso. Verifique se o cliente já possui este pacote liberado.");
+        }
+    });
+}
+
+// 5. EXCLUIR CLIENTE DO SISTEMA (COM LIMPEZA DE ACESSOS)
+async function excluirCliente(clientId, clientEmail) {
+    const confirmar = confirm(`Tem certeza que deseja excluir o cliente "${clientEmail}"? Isso removerá o cadastro e todos os acessos dele.`);
+    if (!confirmar) return;
+
+    try {
+        // 1. Remove primeiro os registros de pacotes liberados para este cliente
+        const { error: errorPacks } = await supabaseClient
+            .from("user_packs")
+            .delete()
+            .eq("user_id", clientId);
+
+        if (errorPacks) {
+            console.warn("Aviso ao limpar user_packs:", errorPacks.message);
+        }
+
+        // 2. Apaga o perfil do cliente na tabela profiles
+        const { error: errorProfile } = await supabaseClient
+            .from("profiles")
+            .delete()
+            .eq("id", clientId);
+
+        if (errorProfile) throw errorProfile;
+
+        alert("Cliente excluído com sucesso! 🌸");
+        carregarClientesEfetivos();
+
+    } catch (error) {
+        console.error("Erro ao excluir cliente:", error);
+        alert(`Erro ao excluir o cliente: ${error.message || "Verifique as permissões (RLS) no Supabase."}`);
+    }
+}
