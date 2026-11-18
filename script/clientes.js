@@ -121,9 +121,7 @@ async function carregarClientesEfetivos() {
 
         if (error) throw error;
 
-        // Filtra removendo:
-        // - Quem tem o mesmo ID ou e-mail do admin logado agora
-        // - Quem tiver role === 'admin' ou is_admin === true na tabela profiles
+        // Filtra removendo o admin logado ou quem tiver role/flag de admin
         const apenasClientes = perfis.filter(perfil => {
             if (adminLogado && (perfil.id === adminLogado.id || perfil.email === adminLogado.email)) {
                 return false;
@@ -149,7 +147,7 @@ async function carregarClientesEfetivos() {
             });
         }
 
-        // Renderiza a lista visual de clientes (sem o admin)
+        // Renderiza a lista visual de clientes com o botão de excluir
         if (customerList) {
             customerList.innerHTML = "";
             if (apenasClientes.length === 0) {
@@ -174,73 +172,13 @@ async function carregarClientesEfetivos() {
                         <strong>${cliente.name || 'Sem nome'}</strong><br>
                         <small style="color: #666;">${cliente.email}</small>
                     </div>
+                    <button class="btn-excluir-cliente" onclick="excluirCliente('${cliente.id}', '${cliente.email}')" style="background-color: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-weight: 600;">
+                        🗑️ Excluir
+                    </button>
                 `;
                 customerList.appendChild(card);
             });
         }
 
     } catch (error) {
-        console.error("Erro ao carregar clientes:", error);
-        if (customerList) {
-            customerList.innerHTML = '<p class="empty-message">Erro ao carregar clientes.</p>';
-        }
-    }
-}
-
-// 3. CARREGAR PACOTES DISPONÍVEIS PARA O SELECT
-async function carregarPacotesParaClientes() {
-    if (!customerPackSelect) return;
-
-    try {
-        const { data: packs, error } = await supabaseClient
-            .from("packs")
-            .select("id, name");
-
-        if (error) throw error;
-
-        customerPackSelect.innerHTML = '<option value="">Selecione um pacote</option>';
-        packs.forEach(pack => {
-            const option = document.createElement("option");
-            option.value = pack.id;
-            option.textContent = pack.name || "Pacote sem nome";
-            customerPackSelect.appendChild(option);
-        });
-
-    } catch (error) {
-        console.error("Erro ao carregar pacotes para clientes:", error);
-    }
-}
-
-// 4. LIBERAR ACESSO AO PACOTE (GRAVAR NA TABELA user_packs)
-if (grantAccessButton) {
-    grantAccessButton.addEventListener("click", async () => {
-        const userId = customerSelect.value;
-        const packId = customerPackSelect.value;
-
-        if (!userId || !packId) {
-            alert("Selecione um cliente e um pacote para liberar o acesso.");
-            return;
-        }
-
-        if (customerStatus) customerStatus.textContent = "Liberando acesso...";
-
-        try {
-            const { error } = await supabaseClient
-                .from("user_packs")
-                .insert([{ user_id: userId, pack_id: packId }]);
-
-            if (error) throw error;
-
-            if (customerStatus) customerStatus.textContent = "Acesso liberado com sucesso! 🌸";
-            alert("Acesso ao pacote liberado para o cliente com sucesso!");
-            
-            customerSelect.value = "";
-            customerPackSelect.value = "";
-
-        } catch (error) {
-            console.error("Erro ao liberar acesso:", error);
-            if (customerStatus) customerStatus.textContent = "Erro ao liberar acesso (já possui ou falha na permissão).";
-            alert("Não foi possível liberar o acesso. Verifique se o cliente já possui este pacote liberado.");
-        }
-    });
-}
+        console.error("Erro ao carregar clientes:",
