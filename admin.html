@@ -413,6 +413,9 @@ async function excluirPacote(idPacote, nomePacote) {
         alert('Não foi possível excluir o pacote. Verifique as permissões (RLS) no Supabase.');
     }
 }
+        <button class="btn-excluir" onclick="excluirPacote('${pacote.id}', '${pacote.nome}')">
+    🗑️ Excluir
+</button>
     </script>
 
     <script src="script/supabase.js"></script>
