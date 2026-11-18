@@ -215,10 +215,9 @@ async function excluirPacote(idPacote, nomePacote) {
         if (error) throw error;
 
         alert("Pacote excluído com sucesso! 🌸");
-        updateDashboard(); // Atualiza a lista na tela na hora
-
+        updateDashboard(); 
     } catch (error) {
         console.error("Erro ao excluir pacote:", error);
-        alert("Erro ao excluir o pacote. Verifique se ele possui figurinhas atreladas ou as permissões no Supabase.");
+        alert("Erro ao excluir o pacote. Verifique as permissões (RLS) no Supabase.");
     }
 }
